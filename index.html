@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Sprite Generator 3D - Crea Sprites con IA</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>🎮</text></svg>">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">🎮</span>
+                <h1>Sprite Generator 3D</h1>
+            </div>
+            <nav class="header-nav">
+                <button id="btnSettings" class="btn btn-icon" title="Configuración">⚙️</button>
+                <button id="btnStats" class="btn btn-icon" title="Estadísticas">📊</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+        <!-- Sidebar: Generator -->
+        <aside class="sidebar">
+            <div class="sidebar-content">
+                <h2>🤖 Generador</h2>
+                
+                <!-- Input de Descripción -->
+                <div class="form-group">
+                    <label for="spriteDescription">Descripción del Sprite</label>
+                    <textarea id="spriteDescription" 
+                              placeholder="Ej: Guerrero futurista con armadura azul, espada de energía, casco con visor rojo..." 
+                              rows="4"></textarea>
+                    <small>Describe detalladamente lo que quieres generar</small>
+                </div>
+
+                <!-- Categoría -->
+                <div class="form-group">
+                    <label for="spriteCategory">Categoría</label>
+                    <select id="spriteCategory">
+                        <option value="">Selecciona una categoría...</option>
+                        <option value="personaje">👤 Personaje</option>
+                        <option value="enemigo">👹 Enemigo</option>
+                        <option value="objeto">🎁 Objeto</option>
+                        <option value="escenario">🏞️ Escenario</option>
+                        <option value="vehiculo">🚗 Vehículo</option>
+                        <option value="arma">⚔️ Arma</option>
+                        <option value="efecto">✨ Efecto Especial</option>
+                        <option value="otro">❓ Otro</option>
+                    </select>
+                </div>
+
+                <!-- Estilo -->
+                <div class="form-group">
+                    <label for="spriteStyle">Estilo</label>
+                    <select id="spriteStyle">
+                        <option value="3d-stylizado">3D Stylizado</option>
+                        <option value="cartoon">Cartoon</option>
+                        <option value="realista">Realista</option>
+                        <option value="pixel-art">Pixel Art</option>
+                        <option value="anime">Anime</option>
+                    </select>
+                </div>
+
+                <!-- Tamaño -->
+                <div class="form-group">
+                    <label for="spriteSize">Tamaño</label>
+                    <select id="spriteSize">
+                        <option value="256">256x256px</option>
+                        <option value="512" selected>512x512px (recomendado)</option>
+                        <option value="1024">1024x1024px</option>
+                    </select>
+                </div>
+
+                <!-- Efectos Especiales -->
+                <div class="form-group checkbox">
+                    <label>
+                        <input type="checkbox" id="spriteEffects">
+                        Añadir efectos especiales (brillo, partículas)
+                    </label>
+                </div>
+
+                <!-- Etiquetas -->
+                <div class="form-group">
+                    <label for="spriteTags">Etiquetas (separadas por coma)</label>
+                    <input type="text" id="spriteTags" placeholder="Ej: futurista, acción, azul">
+                </div>
+
+                <!-- Botón Generar -->
+                <button id="btnGenerate" class="btn btn-primary btn-large">
+                    <span class="btn-icon">✨</span>
+                    Generar Sprite
+                </button>
+
+                <!-- Estado de Carga -->
+                <div id="loadingStatus" class="loading-status hidden">
+                    <div class="spinner"></div>
+                    <p id="loadingText">Generando tu sprite...</p>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Información de Estadísticas -->
+                <div class="stats-mini">
+                    <div class="stat-item">
+                        <span class="stat-label">Sprites Creados</span>
+                        <span id="statCount" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Almacenamiento</span>
+                        <span id="statStorage" class="stat-value">0 MB</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content: Gallery & Details -->
+        <section class="main-content">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Buscar sprites...">
+                </div>
+                <div class="filter-group">
+                    <select id="filterCategory" class="filter-select">
+                        <option value="">Todas las categorías</option>
+                        <option value="personaje">👤 Personaje</option>
+                        <option value="enemigo">👹 Enemigo</option>
+                        <option value="objeto">🎁 Objeto</option>
+                        <option value="escenario">🏞️ Escenario</option>
+                        <option value="vehiculo">🚗 Vehículo</option>
+                        <option value="arma">⚔️ Arma</option>
+                        <option value="efecto">✨ Efecto Especial</option>
+                        <option value="otro">❓ Otro</option>
+                    </select>
+                    <select id="sortBy" class="filter-select">
+                        <option value="reciente">Más reciente</option>
+                        <option value="antiguo">Más antiguo</option>
+                        <option value="nombre">Por nombre (A-Z)</option>
+                    </select>
+                    <button id="btnViewChange" class="btn btn-icon" title="Cambiar vista">📊</button>
+                </div>
+            </div>
+
+            <!-- Gallery View -->
+            <div id="galleryContainer" class="gallery">
+                <div class="empty-state">
+                    <span class="empty-icon">🎨</span>
+                    <h3>Sin sprites aún</h3>
+                    <p>¡Genera tu primer sprite usando el panel izquierdo!</p>
+                </div>
+            </div>
+
+            <!-- Detail View (Hidden by default) -->
+            <div id="detailView" class="detail-view hidden">
+                <div class="detail-header">
+                    <button id="btnBackToGallery" class="btn btn-icon">← Volver</button>
+                    <h2 id="detailTitle">Detalles del Sprite</h2>
+                </div>
+                <div class="detail-content">
+                    <div class="detail-image-container">
+                        <img id="detailImage" src="" alt="Sprite">
+                        <div class="detail-actions">
+                            <button id="btnDownload" class="btn btn-primary">⬇️ Descargar</button>
+                            <button id="btnDelete" class="btn btn-danger">🗑️ Eliminar</button>
+                        </div>
+                    </div>
+                    <div class="detail-info">
+                        <div class="info-group">
+                            <label>Descripción</label>
+                            <p id="detailDescription"></p>
+                        </div>
+                        <div class="info-group">
+                            <label>Categoría</label>
+                            <p id="detailCategory"></p>
+                        </div>
+                        <div class="info-group">
+                            <label>Estilo</label>
+                            <p id="detailStyle"></p>
+                        </div>
+                        <div class="info-group">
+                            <label>Tamaño</label>
+                            <p id="detailSize"></p>
+                        </div>
+                        <div class="info-group">
+                            <label>Fecha de Creación</label>
+                            <p id="detailDate"></p>
+                        </div>
+                        <div class="info-group">
+                            <label>Etiquetas</label>
+                            <div id="detailTags" class="tags-container"></div>
+                        </div>
+                        <div class="info-group">
+                            <label>Prompt Usado</label>
+                            <pre id="detailPrompt"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal: Configuración -->
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ Configuración</h2>
+                <button id="btnCloseSettings" class="btn btn-icon">✕</button>
+            </div>
+            <div class="modal-body">
+                <!-- API Key Configuration -->
+                <div class="settings-section">
+                    <h3>🔑 API Key de Gemini</h3>
+                    <p class="info-text">Tu clave se almacena localmente en el navegador. Nunca se envía a servidores de terceros.</p>
+                    <div class="form-group">
+                        <label for="apiKeyInput">API Key</label>
+                        <div class="input-group">
+                            <input type="password" id="apiKeyInput" placeholder="Pega tu clave de Gemini aquí">
+                            <button id="btnToggleApiKey" class="btn btn-icon">👁️</button>
+                        </div>
+                    </div>
+                    <div class="form-group checkbox">
+                        <label>
+                            <input type="checkbox" id="apiKeySaved">
+                            API Key guardada y lista
+                        </label>
+                    </div>
+                    <button id="btnClearApiKey" class="btn btn-danger">Limpiar API Key</button>
+                </div>
+
+                <!-- Display Settings -->
+                <div class="settings-section">
+                    <h3>🎨 Apariencia</h3>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="darkMode">
+                            Modo oscuro
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="compactView" checked>
+                            Vista compacta en galería
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Advanced Settings -->
+                <div class="settings-section">
+                    <h3>⚡ Configuración Avanzada</h3>
+                    <div class="form-group">
+                        <label for="maxTokens">Tokens máximos por generación</label>
+                        <input type="number" id="maxTokens" value="1000" min="100" max="2000">
+                    </div>
+                    <div class="form-group">
+                        <label for="timeout">Timeout (segundos)</label>
+                        <input type="number" id="timeout" value="30" min="10" max="120">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="autoSave" checked>
+                            Guardar automáticamente
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Data Management -->
+                <div class="settings-section">
+                    <h3>💾 Gestión de Datos</h3>
+                    <p class="info-text">Todos tus sprites se guardan en el almacenamiento local de tu navegador.</p>
+                    <button id="btnExportData" class="btn btn-secondary">📥 Exportar Datos</button>
+                    <button id="btnImportData" class="btn btn-secondary">📤 Importar Datos</button>
+                    <button id="btnClearAllData" class="btn btn-danger">🗑️ Eliminar Todo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Estadísticas -->
+    <div id="statsModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📊 Estadísticas</h2>
+                <button id="btnCloseStats" class="btn btn-icon">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-icon">🎨</span>
+                        <div class="stat-data">
+                            <span class="stat-label">Total Generados</span>
+                            <span id="statTotalGenerated" class="stat-number">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">📦</span>
+                        <div class="stat-data">
+                            <span class="stat-label">Almacenamiento Usado</span>
+                            <span id="statStorageUsed" class="stat-number">0 MB</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">⏱️</span>
+                        <div class="stat-data">
+                            <span class="stat-label">Tiempo Promedio</span>
+                            <span id="statAvgTime" class="stat-number">0s</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">🏆</span>
+                        <div class="stat-data">
+                            <span class="stat-label">Categoría Favorita</span>
+                            <span id="statFavoriteCategory" class="stat-number">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-container">
+                    <div class="chart">
+                        <h3>Sprites por Categoría</h3>
+                        <div id="categoryChart" class="chart-content"></div>
+                    </div>
+                    <div class="chart">
+                        <h3>Generaciones por Día</h3>
+                        <div id="timelineChart" class="chart-content"></div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="recent-activity">
+                    <h3>Actividad Reciente</h3>
+                    <div id="recentActivityList" class="activity-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/storage.js"></script>
+    <script src="js/gemini-api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
