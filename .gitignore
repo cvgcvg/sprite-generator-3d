@@ -1,0 +1,48 @@
+# Gitignore for Sprite Generator 3D
+
+# Node modules (if we add npm packages in the future)
+node_modules/
+package-lock.json
+yarn.lock
+
+# IDEs and editors
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+*.sublime-workspace
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+*.log
+
+# OS files
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Security - never commit API keys
+.api-keys
+api-keys.json
+secrets.json
+config.private.js
+
+# Application data (optional - only if not version controlled)
+# sprites-backup/
+# user-data/
